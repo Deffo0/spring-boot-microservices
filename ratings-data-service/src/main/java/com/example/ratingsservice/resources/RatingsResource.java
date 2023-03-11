@@ -12,13 +12,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/ratings")
 public class RatingsResource {
-
+    @Autowired
+    private RatingRepository ratingRepository;
     @RequestMapping("/{userId}")
     public UserRating getRatingsOfUser(@PathVariable String userId) {
-        List<Rating> ratings = Arrays.asList(
-                new Rating("550", 4)
-        );
-
-        return new UserRating(ratings);
+        return new UserRating(ratingRepository.findById(userId).orElse(null));
     }
 }
