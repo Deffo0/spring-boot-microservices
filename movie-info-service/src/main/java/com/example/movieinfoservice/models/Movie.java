@@ -1,7 +1,8 @@
 package com.example.movieinfoservice.models;
-
+@Document(collection = "movies")
 public class Movie {
-
+    @Id
+    private String id;
     private String movieId;
     private String name;
     private String description;

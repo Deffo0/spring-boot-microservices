@@ -17,7 +17,8 @@ public class MovieResource {
     private String apiKey;
 
     private RestTemplate restTemplate;
-
+    @Autowired
+    private MongoTemplate mongoTemplate;
     public MovieResource(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
@@ -25,9 +26,25 @@ public class MovieResource {
     @RequestMapping("/{movieId}")
     public Movie getMovieInfo(@PathVariable("movieId") String movieId) {
         // Get the movie info from TMDB
-        final String url = "https://api.themoviedb.org/3/movie/" + movieId + "?api_key=" + apiKey;
-        MovieSummary movieSummary = restTemplate.getForObject(url, MovieSummary.class);
+        Optional<MovieCache> cachedMovie = mongoTemplate.findById(movieId, Movie.class);
+        if (cachedMovie.isPresent()) {
+            // return the cached movie
+            return new Movie(
+                    cachedMovie.get().getMovieId(),
+                    cachedMovie.get().getName(),
+                    cachedMovie.get().getDescription()
+            );
+        } else {
+            final String url = "https://api.themoviedb.org/3/movie/" + movieId + "?api_key=" + apiKey;
+            MovieSummary movieSummary = restTemplate.getForObject(url, MovieSummary.class);
+            MovieCache movieCache = new MovieCache(
+                    movieSummary.getId(),
+                    movieSummary.getTitle(),
+                    movieSummary.getOverview()
+            );
+            mongoTemplate.save(movieCache);
 
+        }
         return new Movie(movieId, movieSummary.getTitle(), movieSummary.getOverview());
     }
 }
