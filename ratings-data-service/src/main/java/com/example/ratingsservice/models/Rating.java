@@ -2,7 +2,7 @@ package com.example.ratingsservice.models;
 
 public class Rating {
 
-    private String userId
+    private String userId;
     private String movieId;
     private int rating;
 
