@@ -1,0 +1,25 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package com.trendingmoviesservice.proto;
+
+
+service TopMovies {
+  rpc getTrending(Request) returns (Reply) {}
+}
+  
+message Movie {
+  string movie_id = 1;
+  int32 order = 2;
+  string name = 3;
+  string description = 4;  
+}
+  
+message Request {
+  int32 ntop = 1;
+}
+  
+message Reply {
+  repeated Movie movies = 1;
+}
+  
+  

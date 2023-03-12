@@ -1,26 +1,16 @@
-package com.example.ratingsservice.models;
+package com.trendingmoviesservice.models;
 
 public class Rating {
 
-    private String userId;
     private String movieId;
     private int rating;
 
     public Rating() {
     }
 
-    public Rating(String userId, String movieId, int rating) {
-        this.userId = userId;
+    public Rating(String movieId, int rating) {
         this.movieId = movieId;
         this.rating = rating;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     public String getMovieId() {
