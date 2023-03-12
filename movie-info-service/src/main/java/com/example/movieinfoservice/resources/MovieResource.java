@@ -2,8 +2,6 @@ package com.example.movieinfoservice.resources;
 
 import com.example.movieinfoservice.models.Movie;
 import com.example.movieinfoservice.models.MovieSummary;
-import com.google.common.base.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -13,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/movies")
@@ -31,10 +30,7 @@ public class MovieResource {
     @RequestMapping("/{movieId}")
     public Movie getMovieInfo(@PathVariable("movieId") String movieId) {
         // Get the movie info from TMDB
-        Optional<MovieCache> cachedMovie = (Optional<MovieCache>)mongoTemplate.findById(movieId, Movie.class);
-        final String url = "https://api.themoviedb.org/3/movie/" + movieId + "?api_key=" + apiKey;
-        MovieSummary movieSummary = restTemplate.getForObject(url, MovieSummary.class);
-
+        Optional<Movie> cachedMovie = Optional.ofNullable(mongoTemplate.findById(movieId, Movie.class));
         if (cachedMovie.isPresent()) {
             // return the cached movie
             return new Movie(
@@ -43,14 +39,20 @@ public class MovieResource {
                     cachedMovie.get().getDescription()
             );
         } else {
-            MovieCache movieCache = new MovieCache(
-                    movieSummary.getId(),
-                    movieSummary.getTitle(),
-                    movieSummary.getOverview()
-            );
-            mongoTemplate.save(movieCache);
+            final String url = "https://api.themoviedb.org/3/movie/" + movieId + "?api_key=" + apiKey;
+            Optional<MovieSummary> movieSummary = Optional.ofNullable(restTemplate.getForObject(url, MovieSummary.class));
+            if(movieSummary.isPresent()){
+                Movie movieCache = new Movie(
+                        movieSummary.get().getId(),
+                        movieSummary.get().getTitle(),
+                        movieSummary.get().getOverview()
+                );
+                mongoTemplate.save(movieCache);
+                return new Movie(movieId, movieSummary.get().getTitle(), movieSummary.get().getOverview());
+            }
+
 
         }
-        return new Movie(movieId, movieSummary.getTitle(), movieSummary.getOverview());
+        return null;
     }
 }
