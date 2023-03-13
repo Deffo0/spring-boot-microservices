@@ -1,7 +1,10 @@
 package com.trendingmoviesservice;
 
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
@@ -17,6 +20,7 @@ import com.trendingmoviesservice.proto.TopMoviesGrpc.TopMoviesImplBase;
 @EnableCircuitBreaker
 @EnableHystrixDashboard
 @ComponentScan("com.trendingmoviesservice")
+@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class,HibernateJpaAutoConfiguration.class})
 public class TrendingMoviesServiceApplication {
 
     private final int TIMEOUT = 3000;   // 3 seconds

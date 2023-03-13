@@ -61,7 +61,9 @@ public class MovieCatalogResource {
         System.out.println("lol");
         List<com.trendingmoviesservice.proto.Movie> moviesResponse = this.trendingMoviesService.receiveTrending(10);
         List<Movie> moviestoSend = new ArrayList<Movie>();
-        moviestoSend.add(new Movie(moviesResponse.get(0).getMovieId(), moviesResponse.get(0).getName(), moviesResponse.get(0).getDescription()));
+        for(com.trendingmoviesservice.proto.Movie m : moviesResponse) {
+            moviestoSend.add(new Movie(m.getMovieId(), m.getName(), m.getDescription()));
+        }
         return moviestoSend;
     }
 }

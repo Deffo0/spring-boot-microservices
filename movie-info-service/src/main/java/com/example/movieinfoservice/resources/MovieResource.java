@@ -5,6 +5,8 @@ import com.example.movieinfoservice.models.MovieSummary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +25,7 @@ public class MovieResource {
     private RestTemplate restTemplate;
     @Autowired
     private MongoTemplate mongoTemplate;
+
     public MovieResource(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
@@ -30,7 +33,8 @@ public class MovieResource {
     @RequestMapping("/{movieId}")
     public Movie getMovieInfo(@PathVariable("movieId") String movieId) {
         // Get the movie info from TMDB
-        Optional<Movie> cachedMovie = Optional.ofNullable(mongoTemplate.findById(movieId, Movie.class));
+        Query query = new Query(Criteria.where("movieId").is(movieId));
+        Optional<Movie> cachedMovie = Optional.ofNullable(mongoTemplate.findOne(query, Movie.class));
         if (cachedMovie.isPresent()) {
             // return the cached movie
             return new Movie(
@@ -47,7 +51,9 @@ public class MovieResource {
                         movieSummary.get().getTitle(),
                         movieSummary.get().getOverview()
                 );
+                System.out.println(movieCache.getName());
                 mongoTemplate.save(movieCache);
+                System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
                 return new Movie(movieId, movieSummary.get().getTitle(), movieSummary.get().getOverview());
             }
 
